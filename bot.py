@@ -40,10 +40,14 @@ class Bot:
             Checkpoint(latitude=70.7, longitude=-135.8, radius=50),
             Checkpoint(latitude=71.0, longitude=-144, radius=50),
             Checkpoint(latitude=71.45, longitude=-159.5, radius=50),
-            Checkpoint(latitude=68.5, longitude=-167.5, radius=50),
-            Checkpoint(latitude=65.877243, longitude=-168.620675, radius=50),
+            Checkpoint(latitude=68.5, longitude=-168.0, radius=50),
+            Checkpoint(latitude=65.99, longitude=-168.3, radius=50),
+            Checkpoint(latitude=64.877243, longitude=-168.620675, radius=50),
+
+            Checkpoint(latitude=63.568421, longitude=-167.4, radius=50),
             Checkpoint(latitude=62.568421, longitude=-167.948765, radius=50),
-            Checkpoint(latitude=51.839381, longitude=-179.743013, radius=50),
+            Checkpoint(latitude=60.4, longitude=-171, radius=50),
+            Checkpoint(latitude=51.839381, longitude=-179.35, radius=50),
             Checkpoint(latitude=16, longitude=179.9, radius=50.0), # check 1
             Checkpoint(latitude=14.2, longitude=169, radius=50.0),
             Checkpoint(latitude=12.2, longitude=162, radius=50.0),
@@ -62,8 +66,8 @@ class Bot:
             Checkpoint(latitude=37.2, longitude=11.193104, radius=50.0),
             Checkpoint(latitude=38.0, longitude=10, radius=50.0),
             Checkpoint(latitude=35.830124, longitude=-6.250658, radius=50.0),
-            Checkpoint(latitude=37.2, longitude=-10, radius=50.0),
-            Checkpoint(latitude=43.797109, longitude=-10, radius=50.0),
+            Checkpoint(latitude=36.7, longitude=-10.5, radius=50.0),
+            Checkpoint(latitude=43.797109, longitude=-10.5, radius=50.0),
             Checkpoint(
                 latitude=config.start.latitude,
                 longitude=config.start.longitude,
@@ -168,7 +172,7 @@ class Bot:
                 dist = np.linalg.norm(wf)
                 if dist < 8: #and idx in {1, 25}
                     self.step = -1 if self.step == 1 else 1
-                    angle += self.step * 33
+                    angle += self.step * 45
                 instructions.heading = Heading(angle)
                 break
 

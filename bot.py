@@ -22,7 +22,7 @@ class Bot:
     """
 
     def __init__(self):
-        self.team = "Second Bot"  # This is your team name
+        self.team = "PyCharm JetBot"  # This is your team name
         self.step = 0
         # This is the course that the ship has to follow
         self.course = [

@@ -13,7 +13,7 @@ from vendeeglobe import (
     Vector,
     config,
 )
-from vendeeglobe.utils import distance_on_surface
+from vendeeglobe.utils import distance_on_surface, longitude_difference, goto, wind_force
 
 
 class Bot:
@@ -22,25 +22,55 @@ class Bot:
     """
 
     def __init__(self):
-        self.team = "TeamName"  # This is your team name
+        self.team = "Second Bot"  # This is your team name
+        self.step = 0
         # This is the course that the ship has to follow
         self.course = [
-            Checkpoint(latitude=43.797109, longitude=-11.264905, radius=50),
-            Checkpoint(longitude=-29.908577, latitude=17.999811, radius=50),
-            Checkpoint(latitude=-11.441808, longitude=-29.660252, radius=50),
-            Checkpoint(longitude=-63.240264, latitude=-61.025125, radius=50),
-            Checkpoint(latitude=2.806318, longitude=-168.943864, radius=1990.0),
-            Checkpoint(latitude=-62.052286, longitude=169.214572, radius=50.0),
-            Checkpoint(latitude=-15.668984, longitude=77.674694, radius=1190.0),
-            Checkpoint(latitude=-39.438937, longitude=19.836265, radius=50.0),
-            Checkpoint(latitude=14.881699, longitude=-21.024326, radius=50.0),
-            Checkpoint(latitude=44.076538, longitude=-18.292936, radius=50.0),
+            Checkpoint(latitude=46.8, longitude=-4.5, radius=50),
+            Checkpoint(latitude=58.7, longitude=-42.7, radius=50),
+            Checkpoint(latitude=59.7, longitude=-46.7, radius=50),
+            Checkpoint(latitude=60.7, longitude=-50, radius=50),
+            Checkpoint(latitude=73.9, longitude=-76.8, radius=50),
+            Checkpoint(latitude=74.341717, longitude=-93.926240, radius=50),
+            Checkpoint(latitude=73.8, longitude=-113.519828, radius=50),
+            Checkpoint(latitude=75.3, longitude=-122.296479, radius=50),
+            Checkpoint(latitude=74.7, longitude=-126.296479, radius=50),
+            Checkpoint(latitude=72.0, longitude=-130.0, radius=50),
+            Checkpoint(latitude=71.0, longitude=-130.5, radius=50),
+            Checkpoint(latitude=70.7, longitude=-135.8, radius=50),
+            Checkpoint(latitude=71.0, longitude=-144, radius=50),
+            Checkpoint(latitude=71.45, longitude=-159.5, radius=50),
+            Checkpoint(latitude=68.5, longitude=-167.5, radius=50),
+            Checkpoint(latitude=65.877243, longitude=-168.620675, radius=50),
+            Checkpoint(latitude=62.568421, longitude=-167.948765, radius=50),
+            Checkpoint(latitude=51.839381, longitude=-179.743013, radius=50),
+            Checkpoint(latitude=16, longitude=179.9, radius=50.0), # check 1
+            Checkpoint(latitude=14.2, longitude=169, radius=50.0),
+            Checkpoint(latitude=12.2, longitude=162, radius=50.0),
+            Checkpoint(latitude=9, longitude=152, radius=50.0),
+            Checkpoint(latitude=1, longitude= 128.8, radius=50.0),
+            Checkpoint(latitude=-2.5, longitude= 128.8, radius=50.0),
+            Checkpoint(latitude=-2.9, longitude=125.25, radius=50.0),
+            Checkpoint(latitude=-8.8, longitude=125.322399, radius=50.0),
+            Checkpoint(latitude=-9.241226, longitude=121.346855, radius=50.0),
+            Checkpoint(latitude=-9.2, longitude=116.866910, radius=50.0),
+            Checkpoint(latitude=-5.5, longitude=80, radius=50.0), # check 2
+            Checkpoint(latitude=12.5, longitude=51.0, radius=50.0),
+            Checkpoint(latitude=12.2, longitude=43.3, radius=50.0),
+            Checkpoint(latitude=29.9, longitude=32.3, radius=50.0),
+            Checkpoint(latitude=32.2, longitude=32.3, radius=50.0),
+            Checkpoint(latitude=37.2, longitude=11.193104, radius=50.0),
+            Checkpoint(latitude=38.0, longitude=10, radius=50.0),
+            Checkpoint(latitude=35.830124, longitude=-6.250658, radius=50.0),
+            Checkpoint(latitude=37.2, longitude=-10, radius=50.0),
+            Checkpoint(latitude=43.797109, longitude=-10, radius=50.0),
             Checkpoint(
                 latitude=config.start.latitude,
                 longitude=config.start.longitude,
                 radius=5,
             ),
         ]
+        # self.course = self.course[24:]
 
     def run(
         self,
@@ -110,7 +140,10 @@ class Bot:
         # ===========================================================
 
         # Go through all checkpoints and find the next one to reach
-        for ch in self.course:
+        for idx, ch in enumerate(self.course):
+            if ch.reached:
+                continue
+
             # Compute the distance to the checkpoint
             dist = distance_on_surface(
                 longitude1=longitude,
@@ -127,10 +160,16 @@ class Bot:
             # Check if the checkpoint has been reached
             if dist < ch.radius:
                 ch.reached = True
-            if not ch.reached:
-                instructions.location = Location(
-                    longitude=ch.longitude, latitude=ch.latitude
-                )
+            else:
+                angle = goto(Location(longitude, latitude), Location(longitude=ch.longitude, latitude=ch.latitude))
+                h = angle * np.pi / 180.0
+                ship_vector = np.array([np.cos(h), np.sin(h)])
+                wf = wind_force(ship_vector, np.array(current_position_forecast))
+                dist = np.linalg.norm(wf)
+                if dist < 8: #and idx in {1, 25}
+                    self.step = -1 if self.step == 1 else 1
+                    angle += self.step * 33
+                instructions.heading = Heading(angle)
                 break
 
         return instructions
